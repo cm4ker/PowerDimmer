@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-
 using ModernNotifyIcon.Theme;
 using System.Collections.Generic;
 using System.Reflection;
@@ -48,10 +47,23 @@ namespace PowerDimmer
                     .AddButton(option => option
                         .SetText("E&xit")
                         .AddHandler(() => ExitClicked?.Invoke())))
-                .Build(Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location)!);
+                .Build(GetIcon());
 
             NotifyIcon.Text = "PowerDimmer";
             NotifyIcon.Visible = true;
+        }
+
+        private static Icon? GetIcon()
+        {
+            var location = Assembly.GetExecutingAssembly().Location;
+            if (string.IsNullOrEmpty(location))
+            {
+                location = Environment.ProcessPath;
+            }
+
+            return !string.IsNullOrEmpty(location)
+                ? Icon.ExtractAssociatedIcon(location)
+                : null;
         }
     }
 
@@ -116,11 +128,11 @@ namespace PowerDimmer
             };
 
             trackBar.ValueChanged += (o, s) =>
-                {
-                    // invert for "brightness" value
-                    settings.Brightness = trackBar.Value;
-                    valueBox.Text = trackBar.Value.ToString();
-                };
+            {
+                // invert for "brightness" value
+                settings.Brightness = trackBar.Value;
+                valueBox.Text = trackBar.Value.ToString();
+            };
         }
     }
 }
